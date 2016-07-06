@@ -90,6 +90,36 @@ RUN curl -jkLH "Cookie: oraclelicense=accept-securebackup-cookie" \
         -file /lets-encrypt-x4-cross-signed.pem &&\
     rm -f /*.pem
 
+# Optional SSH server
+COPY keys/* /etc/ssh.cache/
+COPY keys/* /etc/ssh/
+COPY start-ssh /usr/local/bin/
+
+RUN chmod 555 /usr/local/bin/start-ssh &&\
+    chmod -f 400 /etc/ssh/ssh_host_* &&\
+    chmod -f 400 /etc/ssh.cache/ssh_host_* &&\
+    mkdir -p ~root/.ssh &&\
+    chmod 700 ~root/.ssh/ &&\
+    echo "Port 22" >> /etc/ssh/sshd_config &&\
+    cp -a /etc/ssh /etc/ssh.cache && \
+    mkdir -p /var/run/sshd
+
+# A couple of users - matching the jenkins-slave
+RUN groupadd --gid 1000 jenkins &&\
+    useradd --gid 1000 --uid 1000 -s /bin/bash -d /home/jenkins -m jenkins &&\
+    echo "jenkins:jenkins" | chpasswd &&\
+    echo "jenkins ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers &&\
+    groupadd --gid 1001 cloud &&\
+    useradd --gid 1001 --uid 1001 -s /bin/bash -d /home/cloud -m cloud &&\
+    echo "cloud:cloud" | chpasswd &&\
+    echo "cloud ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
+
+# Home directory as jenkins and ensure we are in sudo
+WORKDIR /home/jenkins
+VOLUME /home/jenkins
+
+RUN (echo "jenkins ALL=(ALL) NOPASSWD: ALL"; echo "cloud ALL=(ALL) NOPASSWD: ALL") >>/etc/sudoers
+
 # Don't clean up apt as we can use that as part of dev build jobs later otherwise they'll need to run apt-get update each time
 #    rm -rf /var/lib/apt/lists/*
 

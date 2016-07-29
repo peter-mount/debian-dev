@@ -3,7 +3,7 @@ MAINTAINER Peter Mount <peter@retep.org>
 
 # Java Version - Based on jeanblanchard/jdk
 ENV JAVA_VERSION_MAJOR 8
-ENV JAVA_VERSION_MINOR 92
+ENV JAVA_VERSION_MINOR 102
 ENV JAVA_VERSION_BUILD 14
 ENV JAVA_PACKAGE       jdk
 

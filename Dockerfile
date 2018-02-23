@@ -21,4 +21,12 @@ RUN mkdir -p /var/run/sshd /opt &&\
         git \
         mercurial \
         reprepro \
-        subversion
+        subversion \
+        make \
+        gcc \
+        g++ \
+        python \
+        linux-headers \
+        paxctl \
+        libgcc \
+        libstdc++

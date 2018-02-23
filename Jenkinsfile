@@ -32,9 +32,9 @@ def slaveId = {
 // architecture can be '' for multiarch images
 def dockerImage = {
   architecture, debVersion -> repository + imagePrefix + ':' +
-    debVersion + '-' +
-    ( architecture=='' ? '' : ( architecture + '-' ) ) +
-    version
+    debVersion +
+    ( architecture=='' ? '' : ( '-' + architecture ) ) +
+    ( version=='latest' ? '' : ( '-' + version ) )
 }
 
 // The go arch

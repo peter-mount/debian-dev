@@ -1,4 +1,5 @@
-FROM debian:@@version@@
+ARG debVersion=9
+FROM debian:${debVersion}
 MAINTAINER Peter Mount <peter@retep.org>
 
 RUN mkdir -p /var/run/sshd /opt &&\

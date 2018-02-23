@@ -68,12 +68,14 @@ architectures.each {
     }
 
     debianVersions.each {
-      debVersion -> stage( 'Build ' + architecture + ' deb'+debVersion ) {
-        sh 'docker pull alpine'
-        sh 'docker build -t ' + dockerImage( architecture, debVersion ) + ' .'
-      }
+      debVersion -> stage( 'Debian-' + debVersion + ' ' + architecture ) {
+        sh 'docker pull debian:' + debVersion
 
-      stage( 'Publish ' + architecture + ' deb'+debVersion ) {
+        sh 'docker build' +
+          ' -t ' + dockerImage( architecture, debVersion ) +
+          ' --build-arg debVersion=' + debVersion +
+          ' .'
+
         sh 'docker push ' + dockerImage( architecture, debVersion )
       }
     }

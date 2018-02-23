@@ -26,7 +26,5 @@ RUN mkdir -p /var/run/sshd /opt &&\
         gcc \
         g++ \
         python \
-        linux-headers \
         paxctl \
-        libgcc \
         libstdc++

@@ -80,16 +80,18 @@ def buildArch = {
 }
 
 debianVersions.each {
-  debVersion -> stage( 'Debian-' + debVersion ) {
-  
-    parallel(
-      'amd64': {
-        buildArch( 'amd64', debVersion )
-      },
-      'arm64v8': {
-        buildArch( 'arm64v8', debVersion )
-      }
-    )
+  debVersion ->
+    stage( 'Debian-' + debVersion ) {
+
+      parallel(
+        'amd64': {
+          buildArch( 'amd64', debVersion )
+        },
+        'arm64v8': {
+          buildArch( 'arm64v8', debVersion )
+        }
+      )
+    }
 
     node( "AMD64" ) {
       stage( "MultiArch" + ' Debian-'+debVersion ) {

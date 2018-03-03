@@ -61,48 +61,58 @@ properties( [
   ])
 ])
 
-architectures.each {
-  architecture -> node( slaveId( architecture ) ) {
+def buildArch = {
+  architecture, debVersion -> node( slaveId( architecture ) ) {
     stage( "Checkout " + architecture ) {
       checkout scm
+      sh 'docker pull debian:' + debVersion
     }
 
-    debianVersions.each {
-      debVersion -> stage( 'Debian-' + debVersion + ' ' + architecture ) {
-        sh 'docker pull debian:' + debVersion
-
-        sh 'docker build' +
+    stage( 'Debian-' + debVersion + ' ' + architecture ) {
+      sh 'docker build' +
           ' -t ' + dockerImage( architecture, debVersion ) +
           ' --build-arg debVersion=' + debVersion +
           ' .'
 
-        sh 'docker push ' + dockerImage( architecture, debVersion )
-      }
+      sh 'docker push ' + dockerImage( architecture, debVersion )
     }
   }
 }
 
-node( "AMD64" ) {
-  debianVersions.each {
-    debVersion ->  stage( "Publish MultiArch" + ' deb'+debVersion ) {
-      // The manifest to publish
-      multiImage = dockerImage( '', debVersion )
-
-      // Create/amend the manifest with our architectures
-      manifests = architectures.collect { architecture -> dockerImage( architecture, debVersion ) }
-      sh 'docker manifest create -a ' + multiImage + ' ' + manifests.join(' ')
-
-      // For each architecture annotate them to be correct
-      architectures.each {
-        architecture -> sh 'docker manifest annotate' +
-          ' --os linux' +
-          ' --arch ' + goarch( architecture ) +
-          ' ' + multiImage +
-          ' ' + dockerImage( architecture, debVersion )
+debianVersions.each {
+  debVersion -> stage( 'Debian-' + debVersion ) {
+  
+    parallel(
+      'amd64': {
+        buildArch( 'amd64', debVersion )
+      },
+      'arm64v8': {
+        buildArch( 'arm64v8', debVersion )
       }
+    )
 
-      // Publish the manifest
-      sh 'docker manifest push -p ' + multiImage
+    node( "AMD64" ) {
+      stage( "MultiArch" + ' Debian-'+debVersion ) {
+        // The manifest to publish
+        multiImage = dockerImage( '', debVersion )
+
+        // Create/amend the manifest with our architectures
+        manifests = architectures.collect { architecture -> dockerImage( architecture, debVersion ) }
+        sh 'docker manifest create -a ' + multiImage + ' ' + manifests.join(' ')
+
+        // For each architecture annotate them to be correct
+        architectures.each {
+          architecture -> sh 'docker manifest annotate' +
+            ' --os linux' +
+            ' --arch ' + goarch( architecture ) +
+            ' ' + multiImage +
+            ' ' + dockerImage( architecture, debVersion )
+        }
+
+        // Publish the manifest
+        sh 'docker manifest push -p ' + multiImage
+      }
     }
+
   }
 }

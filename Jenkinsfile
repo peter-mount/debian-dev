@@ -14,7 +14,7 @@ if( version == 'master' ) {
 architectures = [ 'amd64', 'arm64v8' ]
 
 // The debian versions to build
-debianVersions = [ '9' ]
+debianVersions = [ '9', '10' ]
 
 // The slave label based on architecture
 def slaveId = {

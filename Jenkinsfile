@@ -87,6 +87,9 @@ debianVersions.each {
         'amd64': {
           buildArch( 'amd64', debVersion )
         },
+        'arm32v7': {
+          buildArch( 'arm32v7', debVersion )
+        },
         'arm64v8': {
           buildArch( 'arm64v8', debVersion )
         }

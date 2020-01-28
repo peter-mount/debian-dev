@@ -10,7 +10,6 @@ RUN mkdir -p /var/run/sshd /opt &&\
 	man \
         curl \
         libcurl4-openssl-dev \
-        s3cmd \
         unzip \
         vim \
         zip \
@@ -28,3 +27,7 @@ RUN mkdir -p /var/run/sshd /opt &&\
         g++ \
         python \
         paxctl
+
+# s3cmd removed as not available for Debian 10 (buster)
+# https://tracker.debian.org/pkg/s3cmd
+#        s3cmd \

@@ -21,6 +21,8 @@ def slaveId = {
   architecture -> switch( architecture ) {
     case 'amd64':
       return 'AMD64'
+    case 'arm32v7':
+      return 'ARM32v7'
     case 'arm64v8':
       return 'ARM64'
     default:
